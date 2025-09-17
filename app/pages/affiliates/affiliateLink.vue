@@ -117,6 +117,7 @@ onMounted(async () => {
   }
 });
 
+// อัปเดตลิงก์
 const updateLink = async () => {
   error.value = "";
   success.value = "";
@@ -137,12 +138,13 @@ const updateLink = async () => {
   try {
     const token = localStorage.getItem("affiliateToken");
     const res = await axios.put(
-      "http://localhost:8000/api/affiliate/link",
+      "http://localhost:8000/api/affiliate/update-link",
       { newCode: newCode.value },
       { headers: { Authorization: `Bearer ${token}` } }
     );
+
     currentLink.value = res.data.affiliateLink;
-    lastUpdate.value = new Date().toISOString();
+    lastUpdate.value = res.data.lastLinkUpdate;
     success.value = "อัปเดตรหัสเรียบร้อยแล้ว";
     newCode.value = "";
   } catch (err) {

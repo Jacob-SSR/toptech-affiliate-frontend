@@ -24,7 +24,7 @@
       <router-link
         to="/affiliates/dashboard"
         class="block py-2 px-3 rounded hover:bg-gray-700"
-        :class="{ 'bg-gray-800': isActive('/dashboard') }"
+        :class="{ 'bg-gray-800': isActive('/affiliates/dashboard') }"
       >
         หน้าหลัก
       </router-link>
@@ -33,7 +33,7 @@
       <router-link
         to="/affiliates/affiliateLink"
         class="block py-2 px-3 rounded hover:bg-gray-700"
-        :class="{ 'bg-gray-800': isActive('/affiliate/link') }"
+        :class="{ 'bg-gray-800': isActive('/affiliates/affiliateLink') }"
       >
         สร้างลิงก์ Affiliate
       </router-link>
@@ -73,13 +73,13 @@
       </router-link>
     </nav>
 
-    <!-- Logout button -->
+    <!-- Logout -->
     <div class="p-4 border-t border-gray-700">
       <button
         @click="logout"
-        class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
+        class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm"
       >
-        ออกจากระบบ
+        Logout
       </button>
     </div>
   </aside>
@@ -88,15 +88,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { signOut } from "firebase/auth";
+import { useAuth } from "~/composables/useAuth";
 
 const props = defineProps({
   isOpen: { type: Boolean, default: true },
 });
 
 const isMobile = ref(false);
-const router = useRouter();
-
 const handleResize = () => {
   if (typeof window !== "undefined") {
     isMobile.value = window.innerWidth < 768;
@@ -117,19 +115,10 @@ onUnmounted(() => {
 const route = useRoute();
 const isActive = (path) => route.path.startsWith(path);
 
-const { $auth } = useNuxtApp();
-
-const logout = async () => {
-  try {
-    localStorage.removeItem("affiliateToken");
-
-    if ($auth) {
-      await signOut($auth);
-    }
-
-    router.push("/affiliates/login");
-  } catch (err) {
-    console.error("Logout error:", err);
-  }
+const router = useRouter();
+const { setToken } = useAuth();
+const logout = () => {
+  setToken(null);
+  router.push("/affiliates/login");
 };
 </script>

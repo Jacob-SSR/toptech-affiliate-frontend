@@ -55,27 +55,37 @@ const login = async () => {
       email.value,
       password.value
     );
-
     const user = userCredential.user;
 
     if (!user.emailVerified) {
-      router.push({
+      return router.push({
         path: "/verify-email",
         query: { email: user.email },
       });
-      return;
     }
-
     const res = await axios.post("http://localhost:8000/api/affiliate/login", {
       email: email.value,
       password: password.value,
     });
-
     localStorage.setItem("affiliateToken", res.data.token);
 
     router.push("/affiliates/dashboard");
   } catch (err) {
-    error.value = err.response?.data?.message || err.message;
+    if (err.code?.startsWith("auth/")) {
+      switch (err.code) {
+        case "auth/invalid-credential":
+        case "auth/user-not-found":
+          error.value = "ไม่พบบัญชีผู้ใช้ หรือรหัสผ่านไม่ถูกต้อง";
+          break;
+        case "auth/wrong-password":
+          error.value = "รหัสผ่านไม่ถูกต้อง";
+          break;
+        default:
+          error.value = `Firebase Error: ${err.message}`;
+      }
+    } else {
+      error.value = err.response?.data?.message || err.message;
+    }
   }
 };
 </script>
