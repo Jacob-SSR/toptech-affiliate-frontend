@@ -59,8 +59,13 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 
 const router = useRouter();
+const { $auth } = useNuxtApp();
 
 const firstName = ref("");
 const lastName = ref("");
@@ -68,9 +73,11 @@ const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const error = ref("");
+const success = ref("");
 
 const register = async () => {
   error.value = "";
+  success.value = "";
 
   if (password.value !== confirmPassword.value) {
     error.value = "Passwords do not match";
@@ -78,24 +85,29 @@ const register = async () => {
   }
 
   try {
-    const res = await axios.post(
-      "http://localhost:8000/api/affiliate/register",
-      {
-        firstName: firstName.value,
-        lastName: lastName.value,
-        email: email.value,
-        password: password.value,
-        confirmPassword: confirmPassword.value,
-      }
+    const userCredential = await createUserWithEmailAndPassword(
+      $auth,
+      email.value,
+      password.value
     );
 
-    // backend จะส่ง affiliateCode + affiliateLink กลับมาแล้ว (ดูข้อ 2)
-    router.push({
-      path: "/affiliates/login",
-      query: { code: res.data.affiliateCode },
+    await sendEmailVerification(userCredential.user);
+
+    await axios.post("http://localhost:8000/api/affiliate/register", {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      email: email.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value,
     });
+
+    router.push("/affiliates/verify-email");
   } catch (err) {
-    error.value = err.response?.data?.message || err.message;
+    if (err.code === "auth/email-already-in-use") {
+      error.value = "อีเมลนี้ถูกใช้งานแล้ว กรุณาเข้าสู่ระบบ";
+    } else {
+      error.value = err.response?.data?.message || err.message;
+    }
   }
 };
 </script>

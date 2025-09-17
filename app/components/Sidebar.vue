@@ -72,18 +72,30 @@
         ประวัติการจ่ายเงิน
       </router-link>
     </nav>
+
+    <!-- Logout button -->
+    <div class="p-4 border-t border-gray-700">
+      <button
+        @click="logout"
+        class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded text-sm"
+      >
+        ออกจากระบบ
+      </button>
+    </div>
   </aside>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { signOut } from "firebase/auth";
 
 const props = defineProps({
   isOpen: { type: Boolean, default: true },
 });
 
-const isMobile = ref(false); // 👈 ตั้ง default ไว้ก่อน
+const isMobile = ref(false);
+const router = useRouter();
 
 const handleResize = () => {
   if (typeof window !== "undefined") {
@@ -92,7 +104,7 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-  handleResize(); // เช็คครั้งแรกหลัง DOM พร้อม
+  handleResize();
   window.addEventListener("resize", handleResize);
 });
 
@@ -102,7 +114,22 @@ onUnmounted(() => {
   }
 });
 
-// active link check
 const route = useRoute();
 const isActive = (path) => route.path.startsWith(path);
+
+const { $auth } = useNuxtApp();
+
+const logout = async () => {
+  try {
+    localStorage.removeItem("affiliateToken");
+
+    if ($auth) {
+      await signOut($auth);
+    }
+
+    router.push("/affiliates/login");
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+};
 </script>

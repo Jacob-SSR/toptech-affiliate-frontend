@@ -38,20 +38,38 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const email = ref("");
 const password = ref("");
 const error = ref("");
 const router = useRouter();
+const { $auth } = useNuxtApp();
 
 const login = async () => {
   error.value = "";
+
   try {
+    const userCredential = await signInWithEmailAndPassword(
+      $auth,
+      email.value,
+      password.value
+    );
+
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+      router.push({
+        path: "/verify-email",
+        query: { email: user.email },
+      });
+      return;
+    }
+
     const res = await axios.post("http://localhost:8000/api/affiliate/login", {
       email: email.value,
       password: password.value,
     });
-
 
     localStorage.setItem("affiliateToken", res.data.token);
 

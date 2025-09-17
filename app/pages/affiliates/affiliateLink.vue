@@ -101,7 +101,6 @@ const newCode = ref("");
 const error = ref("");
 const success = ref("");
 
-// โหลดข้อมูลปัจจุบัน
 onMounted(async () => {
   try {
     const token = localStorage.getItem("affiliateToken");
@@ -118,12 +117,10 @@ onMounted(async () => {
   }
 });
 
-// อัปเดตรหัส
 const updateLink = async () => {
   error.value = "";
   success.value = "";
 
-  // ✅ Validation
   if (!newCode.value) {
     error.value = "กรุณากรอกรหัสใหม่";
     return;
@@ -146,14 +143,13 @@ const updateLink = async () => {
     );
     currentLink.value = res.data.affiliateLink;
     lastUpdate.value = new Date().toISOString();
-    success.value = "อัปเดตรหัสเรียบร้อยแล้ว ✅";
+    success.value = "อัปเดตรหัสเรียบร้อยแล้ว";
     newCode.value = "";
   } catch (err) {
     error.value = err.response?.data?.message || err.message;
   }
 };
 
-// Copy
 const copyLink = () => {
   navigator.clipboard.writeText(currentLink.value);
   alert("คัดลอกลิงก์เรียบร้อยแล้ว!");

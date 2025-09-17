@@ -106,7 +106,6 @@ onMounted(async () => {
     );
     dashboard.value = res.data;
 
-    // ใช้ข้อมูลจริงจาก backend
     lineOptions.value = {
       chart: { toolbar: { show: false } },
       xaxis: { categories: dashboard.value.chart.days },
