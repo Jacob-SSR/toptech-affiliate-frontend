@@ -93,9 +93,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import Sidebar from "~/components/Sidebar.vue";
+
+// === Runtime config ===
+const config = useRuntimeConfig();
+const backendUrl = config.public.backendUrl;
 
 const sidebarOpen = ref(false);
 const dashboard = ref(null);
@@ -111,6 +115,8 @@ const dictionary = {
     conversion: "อัตราการเปลี่ยน",
     referrals: "ยอดที่ถูกแนะนำ",
     details: "รายละเอียดและรายได้",
+    chartClicks: "คลิก",
+    chartCommission: "ค่าคอมมิชชั่น",
   },
   en: {
     overview: "Overview",
@@ -120,6 +126,8 @@ const dictionary = {
     conversion: "Conversion Rate",
     referrals: "Referrals",
     details: "Details & Revenue",
+    chartClicks: "Clicks",
+    chartCommission: "Commission",
   },
 };
 
@@ -128,37 +136,46 @@ const toggleLanguage = () => {
   language.value = language.value === "th" ? "en" : "th";
 };
 
+// === Charts ===
 const lineOptions = ref({});
 const lineSeries = ref([]);
 const donutOptions = ref({});
 const donutSeries = ref([]);
 
+// โหลด Dashboard
 onMounted(async () => {
   try {
     const token = localStorage.getItem("affiliateToken");
-    const res = await axios.get(
-      "http://localhost:8000/api/affiliate/dashboard",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await axios.get(`${backendUrl}/api/affiliate/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     dashboard.value = res.data;
-
-    lineOptions.value = {
-      chart: { toolbar: { show: false } },
-      xaxis: { categories: dashboard.value.chart.days },
-    };
-    lineSeries.value = [
-      { name: "Clicks", data: dashboard.value.chart.clicks },
-      { name: "Commission", data: dashboard.value.chart.commissions },
-    ];
-
-    donutOptions.value = {
-      labels: ["Clicks", "Orders"],
-    };
-    donutSeries.value = [dashboard.value.clicks, dashboard.value.orders];
+    setCharts();
   } catch (err) {
     console.error(err);
   }
 });
+
+// อัพเดท chart labels ตามภาษา
+watch(language, () => {
+  setCharts();
+});
+
+const setCharts = () => {
+  if (!dashboard.value) return;
+
+  lineOptions.value = {
+    chart: { toolbar: { show: false } },
+    xaxis: { categories: dashboard.value.chart.days },
+  };
+  lineSeries.value = [
+    { name: t("chartClicks"), data: dashboard.value.chart.clicks },
+    { name: t("chartCommission"), data: dashboard.value.chart.commissions },
+  ];
+
+  donutOptions.value = {
+    labels: [t("clicks"), t("orders")],
+  };
+  donutSeries.value = [dashboard.value.clicks, dashboard.value.orders];
+};
 </script>

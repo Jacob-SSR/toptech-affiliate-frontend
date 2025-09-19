@@ -17,6 +17,7 @@ export default defineNuxtConfig({
       FIREBASE_MESSAGING_SENDER_ID:
         process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       FIREBASE_APP_ID: process.env.NUXT_PUBLIC_FIREBASE_APP_ID,
+      backendUrl: process.env.NUXT_BACKEND_URL || "http://localhost:8001",
     },
   },
 });

@@ -26,9 +26,9 @@
       <div class="max-w-xl bg-white p-4 md:p-6 rounded shadow mx-auto w-full">
         <!-- Current Link -->
         <div class="mb-4">
-          <label class="block mb-2 font-medium text-sm md:text-base">
-            ลิงก์ปัจจุบัน
-          </label>
+          <label class="block mb-2 font-medium text-sm md:text-base"
+            >ลิงก์ปัจจุบัน</label
+          >
           <div class="flex flex-col sm:flex-row gap-2">
             <input
               v-model="currentLink"
@@ -101,15 +101,15 @@ const newCode = ref("");
 const error = ref("");
 const success = ref("");
 
+const config = useRuntimeConfig();
+const backendUrl = config.public.backendUrl;
+
 onMounted(async () => {
   try {
     const token = localStorage.getItem("affiliateToken");
-    const res = await axios.get(
-      "http://localhost:8000/api/affiliate/dashboard",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await axios.get(`${backendUrl}/api/affiliate/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     currentLink.value = res.data.affiliateLink;
     lastUpdate.value = res.data.lastLinkUpdate;
   } catch (err) {
@@ -137,7 +137,7 @@ const updateLink = async () => {
   try {
     const token = localStorage.getItem("affiliateToken");
     const res = await axios.put(
-      "http://localhost:8000/api/affiliate/update-link",
+      `${backendUrl}/api/affiliate/update-link`,
       { newCode: newCode.value },
       { headers: { Authorization: `Bearer ${token}` } }
     );

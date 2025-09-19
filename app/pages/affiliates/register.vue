@@ -66,6 +66,8 @@ import {
 
 const router = useRouter();
 const { $auth } = useNuxtApp();
+const config = useRuntimeConfig();
+const backendUrl = config.public.backendUrl;
 
 const firstName = ref("");
 const lastName = ref("");
@@ -93,7 +95,7 @@ const register = async () => {
 
     await sendEmailVerification(userCredential.user);
 
-    await axios.post("http://localhost:8000/api/affiliate/register", {
+    await axios.post(`${backendUrl}/api/affiliate/register`, {
       firstName: firstName.value,
       lastName: lastName.value,
       email: email.value,

@@ -54,6 +54,9 @@ const error = ref("");
 const router = useRouter();
 const { $auth } = useNuxtApp();
 
+const config = useRuntimeConfig();
+const backendUrl = config.public.backendUrl;
+
 const login = async () => {
   error.value = "";
 
@@ -72,7 +75,7 @@ const login = async () => {
       });
     }
 
-    const res = await axios.post("http://localhost:8000/api/affiliate/login", {
+    const res = await axios.post(`${backendUrl}/api/affiliate/login`, {
       email: email.value,
       password: password.value,
     });
