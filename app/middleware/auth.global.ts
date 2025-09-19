@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  // เส้นทางที่ต้องการป้องกัน
   const protectedRoutes = [
     "/affiliates/dashboard",
     "/affiliates/affiliateLink",

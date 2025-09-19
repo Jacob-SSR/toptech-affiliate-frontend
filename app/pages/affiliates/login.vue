@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50"
-  >
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
     <div class="w-full max-w-sm bg-white p-6 rounded-2xl shadow-md">
       <h1 class="text-xl font-bold mb-4 text-center">Affiliate Login</h1>
 
@@ -30,6 +28,16 @@
       </form>
 
       <p v-if="error" class="mt-4 text-red-500">{{ error }}</p>
+
+      <p class="mt-4 text-sm text-center">
+        ยังไม่มีบัญชี? 
+        <NuxtLink
+          to="/affiliates/register"
+          class="text-blue-500 hover:underline"
+        >
+          สมัครสมาชิก
+        </NuxtLink>
+      </p>
     </div>
   </div>
 </template>
@@ -63,6 +71,7 @@ const login = async () => {
         query: { email: user.email },
       });
     }
+
     const res = await axios.post("http://localhost:8000/api/affiliate/login", {
       email: email.value,
       password: password.value,

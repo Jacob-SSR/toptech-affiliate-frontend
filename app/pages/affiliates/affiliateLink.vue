@@ -117,7 +117,6 @@ onMounted(async () => {
   }
 });
 
-// อัปเดตลิงก์
 const updateLink = async () => {
   error.value = "";
   success.value = "";

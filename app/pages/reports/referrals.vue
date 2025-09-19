@@ -30,7 +30,7 @@
           <input
             v-model="search"
             type="text"
-            placeholder="🔍 ค้นหาอีเมล, ชื่อ หรือโค้ด..."
+            placeholder="ค้นหาอีเมล, ชื่อ หรือโค้ด..."
             class="w-full border rounded p-2 text-sm"
           />
         </div>
@@ -51,9 +51,42 @@
               <th class="py-3 px-6">ชื่อ</th>
               <th class="py-3 px-6 min-w-[200px]">อีเมล</th>
               <th class="py-3 px-6 min-w-[150px]">โค้ด</th>
+              <th class="py-3 px-6">Leads</th>
+              <th class="py-3 px-6">Orders</th>
+              <th class="py-3 px-6">ค่าคอมมิชชั่น</th>
               <th class="py-3 px-6">สถานะ</th>
             </tr>
           </thead>
+          <tbody>
+            <tr
+              v-for="item in filteredData"
+              :key="item.id"
+              class="border-t hover:bg-gray-50"
+            >
+              <td class="py-3 px-6">
+                {{ new Date(item.registeredAt).toLocaleDateString("th-TH") }}
+              </td>
+              <td class="py-3 px-6">{{ item.name }}</td>
+              <td class="py-3 px-6">{{ item.email }}</td>
+              <td class="py-3 px-6 font-mono">{{ item.code }}</td>
+              <td class="py-3 px-6">{{ item.leads }}</td>
+              <td class="py-3 px-6">{{ item.orders }}</td>
+              <td class="py-3 px-6">฿{{ item.commission }}</td>
+              <td class="py-3 px-6">
+                <span
+                  class="px-2 py-1 rounded text-xs font-medium"
+                  :class="{
+                    'bg-green-100 text-green-700': item.status === 'APPROVED',
+                    'bg-yellow-100 text-yellow-700': item.status === 'PENDING',
+                    'bg-red-100 text-red-700': item.status === 'REJECTED',
+                  }"
+                >
+                  {{ item.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+
           <tbody>
             <tr
               v-for="(item, idx) in filteredData"
@@ -108,7 +141,6 @@ const filterStatus = ref("");
 const error = ref("");
 const loading = ref(false);
 
-// โหลดข้อมูลจริงจาก backend
 onMounted(async () => {
   try {
     loading.value = true;
@@ -127,7 +159,6 @@ onMounted(async () => {
   }
 });
 
-// ฟิลเตอร์ข้อมูล
 const filteredData = computed(() => {
   return referrals.value.filter((item) => {
     const matchesSearch =
